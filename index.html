@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VẬN HÀNH SỐ</title>
+<style>
+:root {
+  --navy:#0050D0;--orange:#1677FF;--teal:#0EA5E9;--gold:#B45309;
+  --red:#DC2626;--green:#059669;--purple:#4338CA;--lark:#1677FF;
+  --bg:#F0F6FF;--white:#fff;--text:#0F2B5B;--muted:#4B6A9B;
+  --border:#BFDBFE;--card:#fff;
+  --lb:#1677FF;--db:#0050D0;--cb:#E8F3FF;--nb:#0A2D6E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding-bottom:80px;}
+
+/* TOPBAR */
+.topbar{background:var(--db);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;border-bottom:3px solid var(--lb);}
+.tb-brand{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.tb-brand em{color:#93C5FD;font-style:normal;}
+.tb-right{display:flex;gap:8px;align-items:center;}
+.btn{padding:7px 14px;border-radius:8px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);}
+.btn-ghost:hover{background:rgba(255,255,255,.22);}
+.btn-orange{background:var(--lb);color:#fff;}
+.btn-orange:hover{background:#0050D0;}
+
+/* MAIN TABS */
+.main-tabs{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;display:flex;overflow-x:auto;scrollbar-width:none;}
+.main-tabs::-webkit-scrollbar{display:none;}
+.mtab{padding:11px 18px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.mtab:hover{color:var(--db);}
+.mtab.active{color:var(--db);border-bottom-color:var(--lb);font-weight:700;}
+
+/* PAGE */
+.page{display:none;}.page.active{display:block;}
+
+/* ─── CHECKLIST PAGE ───────────────────────────── */
+.dept-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;display:flex;overflow-x:auto;scrollbar-width:none;}
+.dept-bar::-webkit-scrollbar{display:none;}
+.dept-tab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;transition:all .15s;}
+.dept-tab.active{color:var(--db);border-bottom-color:var(--lb);font-weight:700;}
+.shift-bar{background:#F8FAFC;border-bottom:1px solid var(--border);padding:9px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.shift-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;}
+.shift-btn.active{background:var(--db);color:#fff;border-color:var(--db);}
+.camp-row{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.tog{position:relative;width:34px;height:18px;}
+.tog input{opacity:0;width:0;height:0;}
+.tslider{position:absolute;inset:0;background:var(--border);border-radius:18px;cursor:pointer;transition:.2s;}
+.tslider:before{content:'';position:absolute;width:13px;height:13px;left:3px;top:2.5px;background:#fff;border-radius:50%;transition:.2s;}
+.tog input:checked+.tslider{background:var(--lb);}
+.tog input:checked+.tslider:before{transform:translateX(15px);}
+
+.main-wrap{max-width:860px;margin:0 auto;padding:14px 14px;display:flex;flex-direction:column;gap:12px;}
+
+/* Section card */
+.sc{background:var(--card);border-radius:13px;border:1px solid var(--border);overflow:hidden;}
+.sc-hdr{padding:11px 15px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);cursor:pointer;}
+.sc-hdr:hover{background:#FAFBFD;}
+.sc-icon{font-size:17px;}
+.sc-title{font-size:13px;font-weight:700;color:var(--navy);flex:1;}
+.sc-sub{font-size:10.5px;color:var(--muted);margin-top:1px;}
+.sc-sts{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.st-pend{background:#F1F5F9;color:var(--muted);}
+.st-part{background:#FEF3C7;color:#B45309;}
+.st-done{background:#D1FAE5;color:#059669;}
+.st-issue{background:#FEE2E2;color:#DC2626;}
+.sc-chev{font-size:11px;color:var(--muted);transition:transform .2s;}
+.sc.collapsed .sc-chev{transform:rotate(-90deg);}
+.sc-body{padding:13px 15px;display:flex;flex-direction:column;gap:9px;}
+.sc.collapsed .sc-body{display:none;}
+.rule-tag{font-size:11px;background:#EFF6FF;color:#1D4ED8;padding:5px 10px;border-radius:6px;font-weight:600;}
+.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;}
+.ig-grp{display:flex;flex-direction:column;gap:4px;}
+.ig-grp label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.ig-grp input,.ig-grp textarea,.ig-grp select{padding:7px 9px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;color:var(--text);background:#fff;transition:border-color .15s;width:100%;}
+.ig-grp input:focus,.ig-grp textarea:focus{outline:none;border-color:var(--lb);}
+.ig-grp textarea{min-height:50px;resize:vertical;}
+.calc-res{font-size:15px;font-weight:800;padding:7px 9px;background:#F8FAFC;border:1px solid var(--border);border-radius:7px;}
+.calc-res.neg{color:var(--red);}
+.calc-res.pos{color:var(--green);}
+.status-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:8px;align-items:stretch;}
+.sopt{padding:14px 18px;min-height:72px;width:100%;border-radius:14px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.5;white-space:normal;word-break:break-word;overflow-wrap:anywhere;}
+.sopt:hover{background:#F8FAFC;}
+.sopt.ok{background:#D1FAE5;border-color:#10B981;color:#065F46;}
+.sopt.bad{background:#FEE2E2;border-color:#EF4444;color:#991B1B;}
+.sopt.na{background:#F1F5F9;border-color:#94A3B8;color:#475569;}
+.prog-card{background:#fff;border-radius:13px;border:1px solid var(--border);padding:13px 15px;display:flex;align-items:center;gap:14px;}
+.prog-info{flex:1;}
+.prog-info h3{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.prog-bar-bg{height:7px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.prog-bar-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .4s;}
+.prog-stats{display:flex;gap:14px;margin-top:8px;}
+.pstat .v{font-size:18px;font-weight:800;display:block;}
+.pstat .l{font-size:10px;color:var(--muted);text-transform:uppercase;}
+.pstat.ok .v{color:var(--green);}
+.pstat.warn .v{color:var(--orange);}
+.pstat.err .v{color:var(--red);}
+.periodic-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#EDE9FE;color:#5B21B6;}
+.periodic-tag.urgent{background:#FEE2E2;color:#DC2626;}
+.img-up{border:2px dashed var(--border);border-radius:9px;padding:18px;text-align:center;cursor:pointer;color:var(--muted);font-size:12px;transition:all .15s;}
+.img-up:hover{border-color:var(--lb);color:var(--orange);}
+.img-up-ico{font-size:22px;margin-bottom:4px;}
+.camp-alert{background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1px solid rgba(245,158,11,.3);border-radius:9px;padding:11px 13px;display:flex;gap:9px;align-items:flex-start;}
+
+/* ─── XP / RANK PAGE ─────────────────────────────── */
+.xp-page{max-width:860px;margin:0 auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px;}
+.rank-hero{background:linear-gradient(135deg,var(--navy) 0%,#2D4A9E 100%);border-radius:16px;padding:24px;color:#fff;display:flex;align-items:center;gap:20px;}
+.rank-badge-big{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;border:3px solid rgba(255,255,255,.3);}
+.rank-info h2{font-size:22px;font-weight:800;margin-bottom:4px;}
+.rank-info p{font-size:13px;opacity:.75;margin-bottom:12px;}
+.xp-bar-wrap{height:10px;background:rgba(255,255,255,.15);border-radius:5px;overflow:hidden;width:260px;margin-bottom:6px;}
+.xp-bar-fill{height:100%;background:var(--orange);border-radius:5px;transition:width .6s;}
+.xp-label{font-size:12px;opacity:.8;}
+.xp-big{font-size:32px;font-weight:800;color:var(--orange);margin-top:4px;}
+
+.rank-tiers{background:#fff;border-radius:13px;border:1px solid var(--border);overflow:hidden;}
+.rt-hdr{padding:11px 15px;font-size:13px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.tier-row{display:flex;align-items:center;gap:12px;padding:11px 15px;border-bottom:1px solid var(--border);transition:background .15s;}
+.tier-row:last-child{border-bottom:none;}
+.tier-row.current{background:rgba(255,107,43,.05);border-left:3px solid var(--orange);}
+.tier-row.done{opacity:.7;}
+.tier-ico{font-size:24px;flex-shrink:0;width:36px;text-align:center;}
+.tier-info{flex:1;}
+.tier-name{font-size:13px;font-weight:700;color:var(--navy);}
+.tier-xp{font-size:11px;color:var(--muted);margin-top:2px;}
+.tier-reward{font-size:12px;color:var(--teal);font-weight:600;}
+.tier-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.ts-cur{background:rgba(255,107,43,.1);color:var(--orange);}
+.ts-done{background:#D1FAE5;color:#059669;}
+.ts-lock{background:#F1F5F9;color:var(--muted);}
+
+.reward-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.reward-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:14px;text-align:center;transition:all .15s;cursor:pointer;}
+.reward-card:hover{border-color:var(--lb);transform:translateY(-1px);}
+.reward-card.locked{opacity:.55;cursor:not-allowed;}
+.reward-ico{font-size:32px;margin-bottom:8px;}
+.reward-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.reward-cost{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FEF3C7;color:#B45309;}
+.reward-desc{font-size:11px;color:var(--muted);margin-top:6px;}
+.career-badge{background:linear-gradient(135deg,#4338CA,#7C3AED);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;display:inline-block;margin-top:4px;}
+
+.daily-xp-card{background:#fff;border-radius:13px;border:1px solid var(--border);overflow:hidden;}
+.dxp-hdr{background:var(--navy);padding:11px 15px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
+.dxp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-bottom:1px solid var(--border);font-size:13px;}
+.dxp-row:last-child{border-bottom:none;}
+.dxp-dept{color:var(--navy);font-weight:600;}
+.dxp-pts{font-weight:800;color:var(--orange);}
+
+.streak-card{background:linear-gradient(135deg,#92400E,#D97706);border-radius:13px;padding:16px;display:flex;align-items:center;gap:14px;color:#fff;}
+.streak-fire{font-size:36px;}
+.streak-v{font-size:28px;font-weight:800;color:#FCD34D;}
+.streak-l{font-size:12px;opacity:.85;}
+
+/* ─── AI GUIDE PAGE ──────────────────────────────── */
+.ai-page{max-width:860px;margin:0 auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px;height:calc(100vh - 160px);}
+.ai-header{background:linear-gradient(135deg,var(--teal),#0b7b72);border-radius:13px;padding:16px 20px;color:#fff;display:flex;align-items:center;gap:14px;}
+.ai-avatar{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ai-intro h2{font-size:16px;font-weight:800;}
+.ai-intro p{font-size:12px;opacity:.8;margin-top:4px;}
+.ai-quick{display:flex;gap:8px;flex-wrap:wrap;}
+.ai-q{padding:7px 13px;background:#fff;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--navy);transition:all .15s;}
+.ai-q:hover{background:var(--bg);border-color:var(--teal);}
+.chat-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:300px;max-height:420px;}
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.msg.user{flex-direction:row-reverse;}
+.msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.msg-av.bot{background:var(--teal);color:#fff;}
+.msg-av.usr{background:var(--navy);color:#fff;font-size:12px;font-weight:700;}
+.msg-bubble{max-width:78%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.65;}
+.msg.bot .msg-bubble{background:#F0F9F8;border:1px solid rgba(13,148,136,.15);border-radius:4px 12px 12px 12px;color:var(--text);}
+.msg.user .msg-bubble{background:var(--navy);color:#fff;border-radius:12px 4px 12px 12px;}
+.msg-bubble strong{color:var(--teal);}
+.msg.user .msg-bubble strong{color:#93C5FD;}
+.msg-bubble ul{padding-left:16px;margin-top:6px;}
+.msg-bubble li{margin-bottom:4px;}
+.typing{display:flex;gap:4px;padding:10px 13px;background:#F0F9F8;border-radius:4px 12px 12px 12px;width:fit-content;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:bounce .9s infinite;}
+.dot:nth-child(2){animation-delay:.15s;}
+.dot:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}
+.chat-input-row{display:flex;gap:8px;padding-top:8px;border-top:1px solid var(--border);}
+.chat-input{flex:1;padding:10px 13px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;color:var(--text);resize:none;min-height:42px;max-height:100px;}
+.chat-input:focus{outline:none;border-color:var(--teal);}
+.send-btn{padding:10px 16px;background:var(--teal);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:18px;transition:background .15s;flex-shrink:0;}
+.send-btn:hover{background:#0b7b72;}
+.send-btn:disabled{background:var(--border);cursor:not-allowed;}
+.dept-filter{display:flex;gap:6px;flex-wrap:wrap;}
+.df-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;}
+.df-btn:hover{border-color:var(--teal);}
+.df-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:16px;width:min(580px,95vw);max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-hdr{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;}
+.modal-hdr h2{font-size:16px;font-weight:800;color:var(--navy);}
+.modal-close{width:28px;height:28px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;font-size:16px;}
+.modal-body{padding:16px 20px;}
+.report-pre{background:#1E293B;border-radius:9px;padding:13px;font-family:'Courier New',monospace;font-size:12px;color:#E2E8F0;white-space:pre-wrap;line-height:1.7;max-height:300px;overflow-y:auto;}
+
+/* XP toast */
+.xp-toast{position:fixed;bottom:90px;right:16px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;font-weight:700;z-index:400;opacity:0;transform:translateY(20px);transition:all .4s;pointer-events:none;}
+.xp-toast.show{opacity:1;transform:translateY(0);}
+.xp-toast span{color:var(--orange);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand">VẬN <em>HÀNH SỐ</em> <span id="topbar-date" style="font-size:10px;opacity:.5;font-weight:400;margin-left:8px"></span></div>
+  <div class="tb-right">
+    <button class="btn btn-ghost" onclick="openReport()">📋 Báo cáo</button>
+    <button class="btn btn-ghost" id="btn-sync" onclick="syncChecklistToBackend()">🔄 Đồng bộ</button>
+    <button class="btn btn-orange" id="btn-lark" onclick="sendToLark()">📤 Gửi Lark</button>
+  </div>
+</div>
+
+<!-- MAIN TABS -->
+<div class="main-tabs">
+  <button class="mtab active" onclick="switchPage('checklist',this)">📋 Checklist</button>
+  <button class="mtab" onclick="switchPage('xp',this)">🏆 Điểm & Hạng</button>
+  <button class="mtab" onclick="switchPage('bonus',this)">⭐ Cộng điểm ngoài</button>
+  <button class="mtab" onclick="switchPage('ai',this)">🤖 AI Hỏi đáp</button>
+</div>
+
+<!-- ════════════ PAGE: CHECKLIST ════════════ -->
+<div class="page active" id="page-checklist">
+  <div class="dept-bar" id="dept-bar"></div>
+  <div class="shift-bar" id="shift-bar">
+    <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Ca:</span>
+    <button class="shift-btn active" id="sb-sang" onclick="setShift('sang')">☀️ Ca Sáng</button>
+    <button class="shift-btn" id="sb-toi"  onclick="setShift('toi')">🌙 Ca Tối</button>
+    <div class="camp-row">
+      <span>🔔 Camp</span>
+      <label class="tog"><input type="checkbox" id="camp-tog" onchange="toggleCamp()"><span class="tslider"></span></label>
+    </div>
+  </div>
+  <div class="main-wrap" id="checklist-content"></div>
+</div>
+
+<!-- ════════════ PAGE: XP & RANK ════════════ -->
+<div class="page" id="page-xp">
+  <div class="xp-page">
+    <!-- Hero rank card -->
+    <div class="rank-hero" id="rank-hero"></div>
+
+    <!-- Streak -->
+    <div class="streak-card">
+      <div class="streak-fire">🔥</div>
+      <div>
+        <div class="streak-v" id="streak-val">0</div>
+        <div class="streak-l">ngày streak liên tiếp</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:13px;font-weight:700;color:#FCD34D" id="streak-bonus">Streak Bonus: +0 XP</div>
+        <div style="font-size:11px;opacity:.8;margin-top:2px">Mỗi ngày hoàn thành đầy đủ</div>
+      </div>
+    </div>
+
+    <!-- Daily XP table -->
+    <div class="daily-xp-card">
+      <div class="dxp-hdr">⚡ XP kiếm được hôm nay</div>
+      <div id="daily-xp-list"></div>
+    </div>
+
+    <!-- Rank tiers -->
+    <div class="rank-tiers">
+      <div class="rt-hdr">🎖️ Lộ trình thăng hạng & Phần thưởng</div>
+      <div id="tier-list"></div>
+    </div>
+
+    <!-- Reward store -->
+    <div style="font-size:13px;font-weight:700;color:var(--navy);padding:4px 0">🎁 Cửa hàng đổi điểm</div>
+    <div class="reward-grid" id="reward-grid"></div>
+  </div>
+</div>
+
+<!-- ════════════ PAGE: BONUS ════════════ -->
+<div class="page" id="page-bonus">
+  <div class="xp-page">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,var(--db),var(--lb));border-radius:13px;padding:18px 20px;color:#fff;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:32px">⭐</div>
+      <div>
+        <h2 style="font-size:18px;font-weight:800">Cộng điểm thành tích ngoài</h2>
+        <p style="font-size:12px;opacity:.8;margin-top:3px">Ghi nhận kết quả từ NLQL · NLVH · NPS · Giải thưởng tháng · Thành tích tập thể & cá nhân</p>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:26px;font-weight:800;color:#93C5FD" id="bonus-total-xp">0</div>
+        <div style="font-size:11px;opacity:.7">Tổng XP thành tích</div>
+      </div>
+    </div>
+
+    <!-- Form thêm điểm -->
+    <div class="daily-xp-card">
+      <div class="dxp-hdr" style="background:var(--db)">➕ Thêm thành tích mới</div>
+      <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="ig-grp" style="grid-column:1/-1">
+          <label>Loại thành tích</label>
+          <select id="bonus-cat" style="border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;color:var(--text);background:#fff;">
+            <option value="nlql">📊 NLQL — Năng lực quản lý (đánh giá định kỳ)</option>
+            <option value="nlvh">🏪 NLVH — Năng lực vận hành (đánh giá định kỳ)</option>
+            <option value="nps">🌟 NPS tháng đạt chuẩn / xuất sắc</option>
+            <option value="chuongtrinh">🎯 Chương trình tháng đạt target</option>
+            <option value="giai-tap-the">🏆 Giải thưởng tập thể (cửa hàng / khu vực)</option>
+            <option value="giai-ca-nhan">🥇 Giải thưởng cá nhân (nhân viên tiêu biểu...)</option>
+            <option value="kpi-vuot">📈 KPI vượt target đặc biệt</option>
+            <option value="khac">✨ Thành tích khác</option>
+          </select>
+        </div>
+        <div class="ig-grp">
+          <label>Điểm XP cộng thêm</label>
+          <input type="number" id="bonus-xp" min="10" max="2000" placeholder="VD: 300" style="border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;width:100%;">
+        </div>
+        <div class="ig-grp">
+          <label>Ngày đạt được</label>
+          <input type="date" id="bonus-date" style="border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;width:100%;">
+        </div>
+        <div class="ig-grp" style="grid-column:1/-1">
+          <label>Mô tả chi tiết (kết quả cụ thể)</label>
+          <textarea id="bonus-desc" placeholder="VD: NPS tháng 6 đạt 9.2 / 10 — Top 3 khu vực..." style="border:1px solid var(--border);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;min-height:60px;width:100%;resize:vertical;"></textarea>
+        </div>
+        <div style="grid-column:1/-1">
+          <button onclick="addBonus()" style="width:100%;padding:11px;background:var(--lb);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='var(--db)'" onmouseout="this.style.background='var(--lb)'">
+            ⭐ Xác nhận cộng điểm thành tích
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gợi ý mức điểm -->
+    <div class="daily-xp-card">
+      <div class="dxp-hdr" style="background:var(--db)">💡 Gợi ý mức điểm tham khảo</div>
+      <div id="bonus-guide-list">
+        <div class="dxp-row"><span class="dxp-dept">📊 NLQL / NLVH — Đánh giá định kỳ đạt chuẩn</span><span class="dxp-pts" style="color:var(--lb)">200 – 400 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">📊 NLQL / NLVH — Đánh giá xuất sắc</span><span class="dxp-pts" style="color:var(--lb)">500 – 800 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">🌟 NPS tháng đạt chuẩn (≥ 8.5)</span><span class="dxp-pts" style="color:var(--lb)">300 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">🌟 NPS tháng xuất sắc (Top khu vực)</span><span class="dxp-pts" style="color:var(--lb)">600 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">🎯 Chương trình tháng đạt target</span><span class="dxp-pts" style="color:var(--lb)">200 – 500 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">🏆 Giải thưởng tập thể cửa hàng / khu vực</span><span class="dxp-pts" style="color:var(--lb)">500 – 1.000 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">🥇 Giải thưởng cá nhân (nhân viên tiêu biểu)</span><span class="dxp-pts" style="color:var(--lb)">300 – 700 XP</span></div>
+        <div class="dxp-row"><span class="dxp-dept">📈 KPI vượt target đặc biệt (>120%)</span><span class="dxp-pts" style="color:var(--lb)">400 – 600 XP</span></div>
+      </div>
+    </div>
+
+    <!-- Lịch sử thành tích -->
+    <div class="daily-xp-card">
+      <div class="dxp-hdr" style="background:var(--db);display:flex;justify-content:space-between;align-items:center;">
+        <span>📋 Lịch sử thành tích đã ghi nhận</span>
+        <button onclick="clearBonusHistory()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">Xóa tất cả</button>
+      </div>
+      <div id="bonus-history-list"><div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Chưa có thành tích nào được ghi nhận</div></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-ai">
+  <div class="ai-page">
+    <div class="ai-header">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-intro">
+        <h2>OpsFlow AI — Trợ lý Quy trình CPS</h2>
+        <p>Hỏi bất kỳ điều gì về quy trình, rule, SOP. Tôi được huấn luyện từ tài liệu nội bộ CellphoneS.</p>
+      </div>
+    </div>
+
+    <!-- Dept filter for context -->
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Bộ phận của bạn (để AI trả lời đúng ngữ cảnh):</div>
+      <div class="dept-filter">
+        <button class="df-btn active" onclick="setAIDept('all',this)">Tất cả</button>
+        <button class="df-btn" onclick="setAIDept('thu-ngan',this)">💳 Thu Ngân</button>
+        <button class="df-btn" onclick="setAIDept('ky-thuat',this)">🔧 Kỹ Thuật</button>
+        <button class="df-btn" onclick="setAIDept('kho',this)">📦 Kho</button>
+        <button class="df-btn" onclick="setAIDept('ban-hang',this)">🛒 Bán Hàng</button>
+        <button class="df-btn" onclick="setAIDept('quan-ly',this)">👔 Quản Lý</button>
+      </div>
+    </div>
+
+    <!-- Quick questions -->
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Câu hỏi nhanh:</div>
+      <div class="ai-quick" id="quick-qs"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-area" id="chat-area"></div>
+
+    <!-- Input -->
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="Hỏi về quy trình, rule, SOP... (Enter để gửi)" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Report -->
+<div class="modal-bg" id="modal-report">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>📋 Báo cáo — Copy gửi Lark</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="report-pre" id="report-pre">...</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-orange" style="flex:1" onclick="copyReport()">📤 Copy báo cáo</button>
+        <button class="btn btn-ghost" style="flex:1;background:var(--bg);color:var(--navy)" onclick="closeModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="xp-toast" id="xp-toast">+<span id="xp-amount">50</span> XP 🎉</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S = {
+  dept:'thu-ngan', shift:'sang', camp:false,
+  data:{}, aiDept:'all',
+  xp: parseInt(localStorage.getItem('cps_xp')||'0'),
+  streak: parseInt(localStorage.getItem('cps_streak')||'0'),
+  lastDay: localStorage.getItem('cps_lastday')||'',
+  doneToday: JSON.parse(localStorage.getItem('cps_done_today')||'{}'),
+  chatHistory: []
+};
+
+const now = new Date();
+const dayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+const dayNames=['CN','T2','T3','T4','T5','T6','T7'];
+const fmtDate = `${dayNames[now.getDay()]} ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+document.getElementById('topbar-date').textContent = fmtDate;
+const isThurs = now.getDay()===4;
+const is20th  = now.getDate()===20;
+window.addEventListener('hashchange', initPageFromLink);
+
+// ═══════════════════════════════════════════════
+// XP / RANK CONFIG
+// ═══════════════════════════════════════════════
+const XP_TABLE = {
+  'thu-ngan-sang':50,'thu-ngan-toi':50,
+  'ky-thuat-sang':55,'ky-thuat-toi':55,
+  'kho-sang':65,'kho-toi':65,
+  'ban-hang':75,'pg-tc':40,'quan-ly':100
+};
+const BONUS_PERFECT = 20;
+const CAREER_TL = 20000;
+const CAREER_SM = 40000;
+
+const RANKS = [
+  { id:'r0', name:'Nhân viên Mới',       icon:'🔰', minXP:0,     maxXP:2000,  reward:'Huy hiệu nội bộ',      color:'#94A3B8', note:'~Tháng 1'   },
+  { id:'r1', name:'Chuyên viên Junior',  icon:'🥉', minXP:2000,  maxXP:5000,  reward:'Sticker + Tem CPS',     color:'#CD7F32', note:'~Tháng 2-3' },
+  { id:'r2', name:'Chuyên viên',         icon:'🥈', minXP:5000,  maxXP:10000, reward:'Móc khóa Linh vật CPS', color:'#9CA3AF', note:'~Tháng 4-5' },
+  { id:'r3', name:'Senior Staff',        icon:'🥇', minXP:10000, maxXP:15000, reward:'Áo thun logo CPS',       color:'#B45309', note:'~Tháng 6-7' },
+  { id:'r4', name:'Star Member',         icon:'💎', minXP:15000, maxXP:22000, reward:'Bình giữ nhiệt',         color:'#0EA5E9', note:'~Tháng 8-9' },
+  { id:'r5', name:'Elite Ops',           icon:'👑', minXP:22000, maxXP:99999, reward:'Balo CPS Edition',       color:'#1677FF', note:'~Tháng 11+' },
+];
+
+const REWARDS = [
+  { icon:'🏷️', name:'Sticker Pack CPS',       cost:200,   desc:'Bộ sticker logo + linh vật CPS',    career:false },
+  { icon:'🔑', name:'Móc khóa Linh vật',       cost:500,   desc:'Móc khóa cao su linh vật CPS',      career:false },
+  { icon:'👕', name:'Áo thun logo CPS',         cost:900,   desc:'Áo cotton logo CPS, size S-XL',     career:false },
+  { icon:'🍵', name:'Bình giữ nhiệt CPS',       cost:1500,  desc:'Bình inox 500ml in logo CPS',       career:false },
+  { icon:'🎒', name:'Balo CPS Edition',          cost:2500,  desc:'Balo canvas in logo CPS giới hạn', career:false },
+  { icon:'⭐', name:'Công điểm Trợ lý',         cost:20000, desc:'Đủ điểm ứng tuyển Trợ lý — kết hợp XP checklist + thành tích ngoài', career:true },
+  { icon:'🚀', name:'Ưu tiên Trưởng cửa hàng', cost:40000, desc:'Đủ điểm ưu tiên ứng tuyển Trưởng cửa hàng — kết hợp toàn diện',      career:true },
+];
+
+function getRank(xp) {
+  for (let i=RANKS.length-1; i>=0; i--) {
+    if (xp >= RANKS[i].minXP) return RANKS[i];
+  }
+  return RANKS[0];
+}
+
+function saveXP() {
+  localStorage.setItem('cps_xp', S.xp);
+  localStorage.setItem('cps_streak', S.streak);
+  localStorage.setItem('cps_lastday', S.lastDay);
+  localStorage.setItem('cps_done_today', JSON.stringify(S.doneToday));
+}
+
+function awardXP(amount, reason) {
+  S.xp += amount;
+  saveXP();
+  const t = document.getElementById('xp-toast');
+  document.getElementById('xp-amount').textContent = amount;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+  renderXPPage();
+}
+
+// ═══════════════════════════════════════════════
+// SCHEMA — quy trình từng bộ phận
+// ═══════════════════════════════════════════════
+function getSchema(dept, shift) {
+  const all = {
+    'thu-ngan-sang':[
+      { id:'don-dh', icon:'📦', title:'Đơn Online qua DH', rule:'<30 phút',
+        items:[
+          {id:'do-tre',type:'num',label:'SL Trễ',ph:'0'},
+          {id:'do-don',type:'num',label:'SL Đơn',ph:'0'},
+          {id:'do-tl', type:'calc',label:'Tỷ lệ trễ',fn:'pct',src:['do-tre','do-don']},
+          {id:'do-ly', type:'text',label:'Lý do trễ',span:true}
+        ]
+      },
+      { id:'sshh', icon:'🔄', title:'Chuyển TT đơn qua SSHH', rule:'<15 phút',
+        items:[
+          {id:'sh-tre',type:'num',label:'SL Trễ',ph:'0'},
+          {id:'sh-don',type:'num',label:'SL Đơn',ph:'0'},
+          {id:'sh-tl', type:'calc',label:'Tỷ lệ trễ',fn:'pct',src:['sh-tre','sh-don']},
+          {id:'sh-ly', type:'text',label:'Lý do trễ',span:true}
+        ]
+      },
+      { id:'don2h', icon:'⚡', title:'Đơn 2h', rule:'<20 phút',
+        items:[
+          {id:'d2-tre',type:'num',label:'SL Trễ',ph:'0'},
+          {id:'d2-don',type:'num',label:'SL Đơn',ph:'0'},
+          {id:'d2-tl', type:'calc',label:'Tỷ lệ trễ',fn:'pct',src:['d2-tre','d2-don']},
+          {id:'d2-ly', type:'text',label:'Lý do trễ',span:true}
+        ]
+      },
+      { id:'dongth', icon:'🚚', title:'Đơn giao thông thường',
+        sublabel:'Không tính đơn tỉnh',
+        rule:'Trước 14h → giao trước 21h | Sau 14h → giao trước 12h hôm sau',
+        items:[
+          {id:'gt-tre',type:'num',label:'SL Trễ',ph:'0'},
+          {id:'gt-don',type:'num',label:'SL Đơn',ph:'0'},
+          {id:'gt-tl', type:'calc',label:'Tỷ lệ trễ',fn:'pct',src:['gt-tre','gt-don']},
+          {id:'gt-ly', type:'text',label:'Lý do trễ',span:true}
+        ]
+      },
+      { id:'khtn', icon:'⚠️', title:'Xử lý KHTN (Khách hàng tồn nợ)',
+        items:[
+          {id:'kh-qh', type:'num', label:'SL Quá hạn',ph:'0'},
+          {id:'kh-ly', type:'text',label:'Lý do quá hạn',span:true}
+        ]
+      },
+    ],
+    'thu-ngan-toi':[
+      { id:'chi-treo', icon:'💸', title:'Đề nghị chi TREO',
+        items:[{id:'ct-so',type:'num',label:'Số tiền (đ)',ph:'0'},{id:'ct-ly',type:'text',label:'Cụ thể lý do',span:true}]
+      },
+      { id:'phieu-nhap', icon:'📄', title:'Số phiếu nhập',
+        items:[{id:'pn-sl',type:'num',label:'Số phiếu',ph:'0'}]
+      },
+      { id:'chung-tu', icon:'📝', title:'Chứng từ cần ký',
+        items:[{id:'ct-tt',type:'status',label:'Trạng thái',opts:['ĐỦ','THIẾU','N/A']},{id:'ct-ly',type:'text',label:'Lý do nếu thiếu',span:true}]
+      },
+      { id:'thu-cnnb', icon:'💰', title:'Thu CNNB',
+        items:[{id:'cn-so',type:'num',label:'Số tiền (đ)',ph:'0'},{id:'cn-tt',type:'status',label:'Trạng thái',opts:['ĐỦ','THIẾU','CHƯA THU']}]
+      },
+      { id:'thu-aio', icon:'🏦', title:'Thu AIO',
+        items:[{id:'ai-so',type:'num',label:'Số tiền (đ)',ph:'0'},{id:'ai-tt',type:'status',label:'Trạng thái',opts:['ĐỦ','THIẾU','CHƯA THU']}]
+      },
+      { id:'hdgt', icon:'🧾', title:'Phát hành hóa đơn',
+        items:[{id:'hd-sl',type:'num',label:'Số HĐ',ph:'0'},{id:'hd-tt',type:'status',label:'Trạng thái',opts:['ĐỦ','THIẾU','CHƯA XUẤT']}]
+      },
+      { id:'kiem-quy', icon:'🔒', title:'Phiên kiểm quỹ ngày',
+        items:[{id:'kq-tt',type:'status',label:'Kết quả',opts:['KHỚP','LỆCH','CHƯA KIỂM']},{id:'kq-ly',type:'text',label:'Lý do nếu lệch',span:true}]
+      },
+    ],
+    'ky-thuat-sang':[
+      { id:'so-bh', icon:'🛡️', title:'Phiếu bảo hành (SO)',
+        items:[{id:'so-qh',type:'num',label:'Quá hạn',ph:'0'},{id:'so-cv',type:'num',label:'Chờ về',ph:'0'},{id:'so-cn',type:'num',label:'Chưa nhận',ph:'0'},{id:'so-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'may-muon', icon:'📱', title:'Máy mượn',
+        items:[{id:'mm-sl',type:'num',label:'Số lượng',ph:'0'}]
+      },
+      { id:'tiep-nhan', icon:'⚡', title:'Tiếp nhận nhanh',
+        items:[{id:'tn-tra',type:'num',label:'SL Trả',ph:'0'},{id:'tn-nhan',type:'num',label:'SL Nhận',ph:'0'}]
+      },
+      { id:'upload-hinh', icon:'📸', title:'Upload hình máy cũ',
+        items:[{id:'up-chua',type:'num',label:'SL chưa upload',ph:'0'},{id:'up-ly',type:'text',label:'Lý do',span:true}]
+      },
+      { id:'nhap-cu', icon:'📊', title:'Báo cáo nhập cũ',
+        items:[
+          {id:'nc-luot',type:'num',label:'Lượt khách',ph:'0'},
+          {id:'nc-tong',type:'num',label:'Tổng nhập',ph:'0'},
+          {id:'nc-tra', type:'num',label:'Nhập trả',ph:'0'},
+          {id:'nc-miss',type:'num',label:'MISS (SL)',ph:'0'},
+          {id:'nc-msp', type:'text',label:'Số phiếu MISS',ph:'SP001...'},
+          {id:'nc-mly', type:'text',label:'Lý do MISS',span:true}
+        ]
+      },
+    ],
+    'ky-thuat-toi':[
+      { id:'so-bh-t', icon:'🛡️', title:'Phiếu bảo hành (SO)',
+        items:[{id:'sot-qh',type:'num',label:'Quá hạn',ph:'0'},{id:'sot-cv',type:'num',label:'Chờ về',ph:'0'},{id:'sot-cn',type:'num',label:'Chưa nhận',ph:'0'},{id:'sot-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'mm-t', icon:'📱', title:'Máy mượn',
+        items:[{id:'mmt-sl',type:'num',label:'Số lượng',ph:'0'}]
+      },
+      { id:'tn-t', icon:'⚡', title:'Tiếp nhận nhanh',
+        items:[{id:'tnt-tra',type:'num',label:'SL Trả',ph:'0'},{id:'tnt-nhan',type:'num',label:'SL Nhận',ph:'0'}]
+      },
+      { id:'up-t', icon:'📸', title:'Upload hình máy cũ',
+        items:[{id:'upt-chua',type:'num',label:'SL chưa upload',ph:'0'},{id:'upt-ly',type:'text',label:'Lý do',span:true}]
+      },
+      { id:'nc-t', icon:'📊', title:'Báo cáo nhập cũ',
+        items:[
+          {id:'nct-luot',type:'num',label:'Lượt khách',ph:'0'},
+          {id:'nct-tong',type:'num',label:'Tổng nhập',ph:'0'},
+          {id:'nct-tra', type:'num',label:'Nhập trả',ph:'0'},
+          {id:'nct-miss',type:'num',label:'MISS (SL)',ph:'0'},
+          {id:'nct-msp', type:'text',label:'Số phiếu MISS'},
+          {id:'nct-mly', type:'text',label:'Lý do MISS',span:true}
+        ]
+      },
+    ],
+    'kho-sang':[
+      { id:'tu-td', icon:'🖥️', title:'Tủ trưng bày', hasImg:true,
+        items:[{id:'ttd-tt',type:'status',label:'Trạng thái',opts:['ĐẠT','CHƯA ĐẠT','CẦN SỬA']},{id:'ttd-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'vach-pk', icon:'🧱', title:'Vách phụ kiện', hasImg:true,
+        items:[{id:'vpk-tt',type:'status',label:'Trạng thái',opts:['ĐẠT','CHƯA ĐẠT','CẦN SỬA']},{id:'vpk-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'dao-pk', icon:'🔄', title:'Đảo phụ kiện', hasImg:true,
+        items:[{id:'dpk-tt',type:'status',label:'Trạng thái',opts:['XONG','CHƯA ĐẢO','ĐANG ĐẢO']},{id:'dpk-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'ban-tv', icon:'🪑', title:'Bàn tư vấn', hasImg:true,
+        items:[{id:'btv-tt',type:'status',label:'Trạng thái',opts:['ĐẠT','CHƯA ĐẠT','CẦN SỬA']},{id:'btv-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'kho-nb', icon:'🏪', title:'Phòng kho nội bộ', hasImg:true,
+        items:[{id:'knb-tt',type:'status',label:'Trạng thái',opts:['ĐẠT','CHƯA ĐẠT','CẦN SỬA']},{id:'knb-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'bgdt', icon:'🏷️', title:'BGĐT — Bảng giá điện tử',
+        sublabel:'Phân loại riêng 1 khu vực, KHÔNG gắn vào móc treo',
+        items:[
+          {id:'bg-tt',   type:'status',label:'Trạng thái',opts:['ĐẠT','CHƯA ĐẠT']},
+          {id:'bg-macha',type:'text',  label:'% Mã hàng cha/Định biên',ph:'VD: 95%'},
+          {id:'bg-dadung',type:'text', label:'% BGĐT đã sử dụng',ph:'VD: 88%'},
+          {id:'bg-note', type:'text',  label:'Ghi chú',span:true}
+        ]
+      },
+    ],
+    'kho-toi':[
+      { id:'ycc', icon:'🔄', title:'YCC tồn đọng',
+        items:[{id:'ycc-sl',type:'num',label:'SL tồn',ph:'0'},{id:'ycc-ly',type:'text',label:'Lý do',span:true}]
+      },
+      { id:'po-ton', icon:'📋', title:'PO tồn',
+        items:[{id:'po-sl',type:'num',label:'SL PO tồn',ph:'0'},{id:'po-ly',type:'text',label:'Lý do',span:true}]
+      },
+      { id:'kiem-cuoi', icon:'🔒', title:'Phiên kiểm cuối ngày',
+        items:[
+          {id:'kc-ctm', type:'status',label:'CTM Cũ & Demo',opts:['ĐỦ','THIẾU','CHƯA KIỂM']},
+          {id:'kc-duyet',type:'status',label:'Trạng thái duyệt',opts:['ĐÃ DUYỆT','CHƯA DUYỆT']},
+          {id:'kc-ly',  type:'text',  label:'Lý do chưa duyệt',span:true}
+        ]
+      },
+      { id:'rt', icon:'↩️', title:'RT trong ngày',
+        items:[{id:'rt-sl',type:'num',label:'SL RT',ph:'0'},{id:'rt-note',type:'text',label:'Ghi chú',span:true}]
+      },
+      { id:'kiem-pk', icon:'📦', title:'Phiên kiểm PK định kỳ',
+        periodic:isThurs?'⏰ HÔM NAY THỨ 5 — CẦN KIỂM!':'📅 Thứ 5 hàng tuần',
+        periodicUrgent:isThurs,
+        items:[{id:'pk-tt',type:'status',label:'Kết quả',opts:['ĐỦ','THIẾU','CHƯA KIỂM','BỎ QUA']},{id:'pk-ly',type:'text',label:'Lý do thiếu',span:true}]
+      },
+      { id:'kiem-ccdc', icon:'🔨', title:'Phiên kiểm CCDC',
+        periodic:is20th?'⏰ HÔM NAY NGÀY 20 — CẦN KIỂM!':'📅 Ngày 20 hàng tháng',
+        periodicUrgent:is20th,
+        items:[{id:'cd-tt',type:'status',label:'Kết quả',opts:['ĐỦ','THIẾU','CHƯA KIỂM','BỎ QUA']},{id:'cd-ly',type:'text',label:'Lý do thiếu',span:true}]
+      },
+    ],
+    'ban-hang':[
+      { id:'ds',icon:'💰',title:'Doanh số',
+        items:[{id:'ds-tg',type:'num',label:'Target',ph:'0'},{id:'ds-tt',type:'num',label:'Thực đạt',ph:'0'},{id:'ds-con',type:'calc',label:'Còn thiếu',fn:'diff',src:['ds-tg','ds-tt']}]
+      },
+      { id:'sptt',icon:'📱',title:'SPTT',
+        items:[{id:'sp-tg',type:'num',label:'Target',ph:'0'},{id:'sp-tt',type:'num',label:'Thực đạt',ph:'0'},{id:'sp-con',type:'calc',label:'Còn thiếu',fn:'diff',src:['sp-tg','sp-tt']}]
+      },
+      { id:'laptop',icon:'💻',title:'Laptop',
+        items:[{id:'lp-tg',type:'num',label:'Target',ph:'0'},{id:'lp-tt',type:'num',label:'Thực đạt',ph:'0'},{id:'lp-con',type:'calc',label:'Còn thiếu',fn:'diff',src:['lp-tg','lp-tt']}]
+      },
+      { id:'iph-cu',icon:'📲',title:'iPhone cũ',
+        items:[{id:'ic-tg',type:'num',label:'Target',ph:'0'},{id:'ic-tt',type:'num',label:'Thực đạt',ph:'0'},{id:'ic-con',type:'calc',label:'Còn thiếu',fn:'diff',src:['ic-tg','ic-tt']}]
+      },
+      { id:'bhmr',icon:'🛡️',title:'BHMR / S-Star',
+        items:[{id:'bh-tg',type:'num',label:'Target',ph:'0'},{id:'bh-tt',type:'num',label:'Thực đạt',ph:'0'},{id:'bh-con',type:'calc',label:'Còn thiếu',fn:'diff',src:['bh-tg','bh-tt']}]
+      },
+      { id:'nhom-db',icon:'⭐',title:'Nhóm ĐB',
+        items:[{id:'db-note',type:'text',label:'Chi tiết nhóm ĐB',span:true}]
+      },
+      { id:'kh-bh',icon:'👥',title:'Chỉ số khách hàng',
+        items:[
+          {id:'km-luot',type:'num',label:'Lượt khách',ph:'0'},
+          {id:'km-miss',type:'num',label:'SL MISS',ph:'0'},
+          {id:'km-app', type:'num',label:'Tải App',ph:'0'},
+          {id:'km-sv',  type:'num',label:'TV Sinh viên',ph:'0'}
+        ]
+      },
+    ],
+    'pg-tc':[
+      { id:'pg-m',icon:'👤',title:'PG / Nhân viên Tài chính',
+        items:[
+          {id:'pg-luot',type:'num',label:'Lượt khách',ph:'0'},
+          {id:'pg-miss',type:'num',label:'SL MISS',ph:'0'},
+          {id:'pg-app', type:'num',label:'Tải App',ph:'0'},
+          {id:'pg-sv',  type:'num',label:'TV Sinh viên',ph:'0'}
+        ]
+      },
+    ],
+    'quan-ly':[
+      { id:'ngoai-shop',icon:'🏪',title:'Hình ảnh ngoài shop',hasImg:true,
+        sublabel:'Báo cáo kèm hình ảnh + timestamp',
+        items:[
+          {id:'ns-bandrol',type:'status',label:'Bandrol/Biển vẫy — cây không che bảng hiệu',opts:['ĐẠT','CHƯA ĐẠT']},
+          {id:'ns-chiengoia',type:'status',label:'Bảng chiến giá (giá cuối trừ hết ưu đãi)',opts:['ĐẠT','CHƯA ĐẠT']},
+          {id:'ns-loa', type:'status',label:'Loa chương trình tháng mới',opts:['ĐANG CHẠY','CHƯA BẬT','LỖI']},
+          {id:'ns-nhac',type:'status',label:'Nhạc shop / link CTKD',opts:['ĐANG CHẠY','CHƯA BẬT','LỖI']},
+          {id:'ns-mxh', type:'status',label:'Bài Zalo/FB/TikTok hôm nay',opts:['ĐÃ ĐĂNG','CHƯA ĐĂNG','N/A']},
+          {id:'ns-note',type:'text',  label:'Ghi chú',span:true}
+        ]
+      },
+      { id:'van-hanh',icon:'📊',title:'Tiêu chí vận hành',
+        sublabel:'Báo số liệu, ghi rõ lý do nếu chưa có',
+        items:[
+          {id:'vh-nps-n', type:'text',label:'NPS Ngày',ph:'VD: 8.5'},
+          {id:'vh-nps-t', type:'text',label:'NPS Tháng',ph:'VD: 8.2'},
+          {id:'vh-nps-ly',type:'text',label:'Lỗi NPS + PA xử lý',span:true},
+          {id:'vh-app-n', type:'text',label:'Tải App Ngày',ph:'%'},
+          {id:'vh-app-t', type:'text',label:'Tải App Tháng',ph:'%'},
+          {id:'vh-cr-n',  type:'text',label:'CR DH Online Ngày',ph:'%'},
+          {id:'vh-cr-t',  type:'text',label:'CR DH Online Tháng',ph:'%'},
+          {id:'vh-tre-n', type:'text',label:'Trễ ĐH Ngày (2h+Thường)',ph:'%'},
+          {id:'vh-tre-t', type:'text',label:'Trễ ĐH Tháng',ph:'%'},
+          {id:'vh-aio-n', type:'text',label:'AIOV2 Ngày',ph:'%'},
+          {id:'vh-aio-t', type:'text',label:'AIOV2 Tháng',ph:'%'},
+          {id:'vh-bgdt',  type:'text',label:'BGĐT % Mã cha/Định biên',ph:'%'},
+          {id:'vh-code',  type:'text',label:'Sử dụng CODE (số tiền vượt)',span:true},
+          {id:'vh-sim-n', type:'text',label:'SIM VNSKY Ngày',ph:'%'},
+          {id:'vh-sim-t', type:'text',label:'SIM VNSKY Tháng',ph:'%'},
+          {id:'vh-ksim-n',type:'text',label:'Kích SIM Ngày',ph:'%'},
+          {id:'vh-sv',    type:'text',label:'TV Student',ph:'SL/tỷ lệ'}
+        ]
+      },
+      { id:'nlvh',icon:'🎯',title:'Chỉ tiêu NLVH',
+        sublabel:'Chưa có → ghi "Đang theo dõi"',
+        items:[
+          {id:'nl-test',type:'text',label:'Bài test đối tác + KHBM',span:true,ph:'Điểm / Kết quả'},
+          {id:'nl-ns',  type:'text',label:'Nhân sự nghỉ việc (không tính tiếp đón + QL)',ph:'Số người'},
+          {id:'nl-tt',  type:'text',label:'Thất thoát hàng hóa',ph:'Giá trị / Số SKU'}
+        ]
+      },
+    ],
+  };
+  const key = ['ban-hang','pg-tc','quan-ly'].includes(dept) ? dept : `${dept}-${shift}`;
+  return all[key]||[];
+}
+
+// ═══════════════════════════════════════════════
+// DEPT CONFIG
+// ═══════════════════════════════════════════════
+const DEPTS=[
+  {id:'thu-ngan',label:'💳 Thu Ngân',hasShift:true},
+  {id:'ky-thuat',label:'🔧 Kỹ Thuật',hasShift:true},
+  {id:'kho',     label:'📦 Kho',     hasShift:true},
+  {id:'ban-hang',label:'🛒 Bán Hàng',hasShift:false},
+  {id:'pg-tc',   label:'🤝 PG/TC',   hasShift:false},
+  {id:'quan-ly', label:'👔 Quản Lý', hasShift:false},
+];
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+function switchPage(page, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    const map = {
+      checklist: document.querySelectorAll('.mtab')[0],
+      xp: document.querySelectorAll('.mtab')[1],
+      bonus: document.querySelectorAll('.mtab')[2],
+      ai: document.querySelectorAll('.mtab')[3]
+    };
+    map[page]?.classList.add('active');
+  }
+  try {
+    const url = new URL(window.location.href);
+    url.hash = page;
+    history.replaceState(null, '', url.toString());
+  } catch (e) {}
+  if (page==='xp') renderXPPage();
+  if (page==='bonus') renderBonusPage();
+}
+
+function initPageFromLink() {
+  const hash = (window.location.hash || '').replace('#', '').trim();
+  const params = new URLSearchParams(window.location.search);
+  const page = hash || params.get('tab') || 'checklist';
+  if (['checklist','xp','bonus','ai'].includes(page)) switchPage(page);
+}
+
+// ═══════════════════════════════════════════════
+// BONUS XP — Thành tích ngoài
+// ═══════════════════════════════════════════════
+const CAT_LABELS = {
+  'nlql':       '📊 NLQL — Năng lực quản lý',
+  'nlvh':       '🏪 NLVH — Năng lực vận hành',
+  'nps':        '🌟 NPS tháng',
+  'chuongtrinh':'🎯 Chương trình tháng',
+  'giai-tap-the':'🏆 Giải thưởng tập thể',
+  'giai-ca-nhan':'🥇 Giải thưởng cá nhân',
+  'kpi-vuot':   '📈 KPI vượt target',
+  'khac':       '✨ Thành tích khác',
+};
+
+function loadBonusHistory() {
+  return JSON.parse(localStorage.getItem('vhs_bonus_history')||'[]');
+}
+function saveBonusHistory(h) {
+  localStorage.setItem('vhs_bonus_history', JSON.stringify(h));
+}
+function getBonusTotalXP() {
+  return loadBonusHistory().reduce((s, b) => s + (b.xp||0), 0);
+}
+
+function addBonus() {
+  const cat   = document.getElementById('bonus-cat').value;
+  const xp    = parseInt(document.getElementById('bonus-xp').value)||0;
+  const desc  = document.getElementById('bonus-desc').value.trim();
+  const date  = document.getElementById('bonus-date').value || new Date().toISOString().split('T')[0];
+
+  if (xp <= 0) { alert('Vui lòng nhập số XP hợp lệ (> 0)'); return; }
+  if (!desc)   { alert('Vui lòng mô tả chi tiết thành tích'); return; }
+
+  const entry = { id: Date.now(), cat, xp, desc, date };
+  const history = loadBonusHistory();
+  history.unshift(entry);
+  saveBonusHistory(history);
+
+  // Cộng vào tổng XP
+  S.xp += xp;
+  saveXP();
+
+  // Show toast
+  awardXP(xp, '');
+
+  // Reset form
+  document.getElementById('bonus-xp').value = '';
+  document.getElementById('bonus-desc').value = '';
+
+  renderBonusPage();
+  renderXPPage();
+}
+
+function renderBonusPage() {
+  const history = loadBonusHistory();
+  const total = history.reduce((s,b) => s+(b.xp||0), 0);
+  const el = document.getElementById('bonus-total-xp');
+  if (el) el.textContent = '+' + total.toLocaleString('vi-VN') + ' XP';
+
+  // Set today's date as default
+  const dateEl = document.getElementById('bonus-date');
+  if (dateEl && !dateEl.value) {
+    dateEl.value = new Date().toISOString().split('T')[0];
+  }
+
+  const list = document.getElementById('bonus-history-list');
+  if (!list) return;
+  if (!history.length) {
+    list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Chưa có thành tích nào được ghi nhận</div>';
+    return;
+  }
+  list.innerHTML = history.map(b => `
+    <div class="dxp-row" style="align-items:flex-start;padding:12px 15px;gap:10px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--db)">${CAT_LABELS[b.cat]||b.cat}</div>
+        <div style="font-size:13px;color:var(--text);margin-top:3px">${b.desc}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${b.date}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span style="font-size:15px;font-weight:800;color:var(--lb)">+${b.xp.toLocaleString('vi-VN')} XP</span>
+        <button onclick="deleteBonus(${b.id})" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit">Xóa</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteBonus(id) {
+  const history = loadBonusHistory();
+  const entry = history.find(b => b.id === id);
+  if (entry) {
+    S.xp = Math.max(0, S.xp - entry.xp);
+    saveXP();
+  }
+  saveBonusHistory(history.filter(b => b.id !== id));
+  renderBonusPage();
+  renderXPPage();
+}
+
+function clearBonusHistory() {
+  if (!confirm('Xóa toàn bộ lịch sử thành tích? XP đã cộng sẽ bị trừ lại.')) return;
+  const total = getBonusTotalXP();
+  S.xp = Math.max(0, S.xp - total);
+  saveXP();
+  saveBonusHistory([]);
+  renderBonusPage();
+  renderXPPage();
+}
+
+function renderDeptBar() {
+  const bar=document.getElementById('dept-bar');
+  bar.innerHTML=DEPTS.map(d=>`
+    <button class="dept-tab ${d.id===S.dept?'active':''}" onclick="selectDept('${d.id}')">${d.label}</button>
+  `).join('');
+}
+
+function selectDept(id) {
+  S.dept=id;
+  const d=DEPTS.find(x=>x.id===id);
+  document.getElementById('shift-bar').style.display=d&&d.hasShift?'flex':'none';
+  if(!d.hasShift) S.shift='all';
+  renderDeptBar();
+  renderChecklist();
+}
+
+function setShift(sh) {
+  S.shift=sh;
+  document.getElementById('sb-sang').classList.toggle('active',sh==='sang');
+  document.getElementById('sb-toi').classList.toggle('active',sh==='toi');
+  renderChecklist();
+}
+
+function toggleCamp() {
+  S.camp=document.getElementById('camp-tog').checked;
+  renderChecklist();
+}
+
+// ═══════════════════════════════════════════════
+// CHECKLIST RENDER
+// ═══════════════════════════════════════════════
+function renderChecklist() {
+  const schema=getSchema(S.dept,S.shift);
+  const wrap=document.getElementById('checklist-content');
+  wrap.innerHTML='';
+
+  if(S.camp){
+    const ca=document.createElement('div');
+    ca.className='camp-alert';
+    ca.innerHTML='<span style="font-size:18px">🔔</span><div><p style="font-size:13px;font-weight:700;color:#92400E">Chế độ CAMP đang bật — Điền đầy đủ trước khi kết ca!</p><p style="font-size:12px;color:#B45309;margin-top:2px">Hoàn thành checklist camp sẽ nhận thêm 2x XP hôm nay.</p></div>';
+    wrap.appendChild(ca);
+  }
+
+  // Progress bar
+  const prog=document.createElement('div');
+  prog.className='prog-card';
+  prog.id='prog-card';
+  prog.innerHTML=`
+    <div class="prog-info">
+      <h3>Tiến độ checklist hôm nay</h3>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-stats">
+        <div class="pstat ok"><span class="v" id="p-done">0</span><span class="l">Xong</span></div>
+        <div class="pstat warn"><span class="v" id="p-total">0</span><span class="l">Tổng</span></div>
+        <div class="pstat err"><span class="v" id="p-issue">0</span><span class="l">Vấn đề</span></div>
+      </div>
+    </div>
+    <div id="prog-xp" style="text-align:center;padding:0 8px">
+      <div style="font-size:24px;font-weight:800;color:var(--orange)" id="prog-xp-val">+${XP_TABLE[S.dept+'-'+S.shift]||XP_TABLE[S.dept]||50}</div>
+      <div style="font-size:10px;color:var(--muted)">XP khi hoàn thành</div>
+    </div>
+  `;
+  wrap.appendChild(prog);
+
+  schema.forEach(sec=>{
+    const card=document.createElement('div');
+    card.className='sc';
+    card.id='sc-'+sec.id;
+
+    let perioTag='';
+    if(sec.periodic){
+      const cls=sec.periodicUrgent?'periodic-tag urgent':'periodic-tag';
+      perioTag=`<span class="${cls}">${sec.periodic}</span>`;
+    }
+    let imgHtml='';
+    if(sec.hasImg){
+      imgHtml=`<div class="img-up" onclick="this.querySelector('input').click()">
+        <div class="img-up-ico">📷</div><div>Tap chụp/chọn ảnh layout</div>
+        <input type="file" accept="image/*" capture="environment" style="display:none" onchange="previewImg(event,'${sec.id}')">
+      </div>
+      <div id="imgprev-${sec.id}" style="display:flex;gap:6px;flex-wrap:wrap"></div>`;
+    }
+
+    const itemsHtml=sec.items.map(it=>renderItem(it,sec.id)).join('');
+
+    card.innerHTML=`
+      <div class="sc-hdr" onclick="toggleSec('${sec.id}')">
+        <span class="sc-icon">${sec.icon}</span>
+        <div style="flex:1">
+          <div class="sc-title">${sec.title}</div>
+          ${sec.sublabel?`<div class="sc-sub">${sec.sublabel}</div>`:''}
+        </div>
+        ${perioTag}
+        <span class="sc-sts st-pend" id="sts-${sec.id}">Chưa điền</span>
+        <span class="sc-chev">▼</span>
+      </div>
+      <div class="sc-body">
+        ${sec.rule?`<div class="rule-tag">⏱ Quy định: ${sec.rule}</div>`:''}
+        ${imgHtml}
+        <div class="ig">${itemsHtml}</div>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+function renderItem(it, secId){
+  const key=`${S.dept}-${S.shift}-${it.id}`;
+  const v=S.data[key]||'';
+  const sp=it.span?'style="grid-column:1/-1"':'';
+
+  if(it.type==='num') return `<div class="ig-grp" ${sp}>
+    <label>${it.label}</label>
+    <input type="number" min="0" placeholder="${it.ph||0}" value="${v}"
+      oninput="save('${key}','${secId}',this.value);calcAll('${secId}')">
+  </div>`;
+
+  if(it.type==='text') return `<div class="ig-grp" ${sp}>
+    <label>${it.label}</label>
+    <textarea placeholder="${it.ph||''}" oninput="save('${key}','${secId}',this.value)">${v}</textarea>
+  </div>`;
+
+  if(it.type==='calc') return `<div class="ig-grp" ${sp}>
+    <label>${it.label}</label>
+    <div class="calc-res" id="calc-${it.id}">—</div>
+  </div>`;
+
+  if(it.type==='status'){
+    const opts=(it.opts||['ĐẠT','CHƯA ĐẠT','N/A']).map(o=>{
+      const okWords=['ĐỦ','ĐẠT','XONG','ĐÃ DUYỆT','ĐANG CHẠY','KHỚP','ĐÃ ĐĂNG'];
+      const naWords=['N/A','BỎ QUA','CHƯA KIỂM'];
+      const cls=v===o?(okWords.includes(o)?'ok':naWords.includes(o)?'na':'bad'):'';
+      return `<button class="sopt ${cls}" onclick="setStatus('${key}','${secId}','${o}',this)">${o}</button>`;
+    }).join('');
+    return `<div class="ig-grp" ${sp}>
+      <label>${it.label}</label>
+      <div class="status-row">${opts}</div>
+    </div>`;
+  }
+  return '';
+}
+
+function save(key,secId,val){
+  S.data[key]=val;
+  updateSecStatus(secId);
+  updateProgress();
+}
+
+function setStatus(key,secId,val,el){
+  S.data[key]=val;
+  el.closest('.status-row').querySelectorAll('.sopt').forEach(b=>b.classList.remove('ok','bad','na'));
+  const okWords=['ĐỦ','ĐẠT','XONG','ĐÃ DUYỆT','ĐANG CHẠY','KHỚP','ĐÃ ĐĂNG'];
+  const naWords=['N/A','BỎ QUA','CHƯA KIỂM'];
+  el.classList.add(okWords.includes(val)?'ok':naWords.includes(val)?'na':'bad');
+  updateSecStatus(secId);
+  updateProgress();
+}
+
+function calcAll(secId){
+  const schema=getSchema(S.dept,S.shift);
+  const sec=schema.find(s=>s.id===secId);
+  if(!sec)return;
+  sec.items.filter(i=>i.type==='calc').forEach(it=>{
+    const el=document.getElementById('calc-'+it.id);
+    if(!el)return;
+    const [a,b]=it.src.map(id=>parseFloat(S.data[`${S.dept}-${S.shift}-${id}`])||0);
+    if(it.fn==='pct'){
+      const p=b>0?((a/b)*100).toFixed(1):'0.0';
+      el.textContent=p+'%';
+      el.className='calc-res '+(parseFloat(p)>15?'neg':'pos');
+    } else if(it.fn==='diff'){
+      const d=a-b;
+      el.textContent=d<=0?'✅ ĐẠT':d.toLocaleString('vi-VN');
+      el.className='calc-res '+(d<=0?'pos':'neg');
+    }
+  });
+}
+
+function updateSecStatus(secId){
+  const schema=getSchema(S.dept,S.shift);
+  const sec=schema.find(s=>s.id===secId);
+  if(!sec)return;
+  const el=document.getElementById('sts-'+secId);
+  if(!el)return;
+  const keys=sec.items.filter(i=>i.type!=='calc').map(i=>`${S.dept}-${S.shift}-${i.id}`);
+  const filled=keys.filter(k=>S.data[k]&&String(S.data[k]).trim()!=='');
+  const hasIssue=keys.some(k=>{const v=S.data[k]||'';return['THIẾU','CHƯA ĐẠT','LỆCH','CHƯA DUYỆT','CHƯA BẬT'].includes(v);});
+  el.className='sc-sts '+(filled.length===0?'st-pend':hasIssue?'st-issue':filled.length===keys.length?'st-done':'st-part');
+  el.textContent=filled.length===0?'Chưa điền':hasIssue?'⚠️ Vấn đề':filled.length===keys.length?'✅ Xong':`${filled.length}/${keys.length}`;
+}
+
+function updateProgress(){
+  const schema=getSchema(S.dept,S.shift);
+  let total=0,done=0,issues=0;
+  schema.forEach(sec=>{
+    const keys=sec.items.filter(i=>i.type!=='calc').map(i=>`${S.dept}-${S.shift}-${i.id}`);
+    total+=keys.length;
+    keys.forEach(k=>{
+      if(S.data[k]&&String(S.data[k]).trim()!=='')done++;
+      if(['THIẾU','CHƯA ĐẠT','LỆCH','CHƯA DUYỆT'].includes(S.data[k]))issues++;
+    });
+  });
+  const pct=total>0?Math.round(done/total*100):0;
+  const fill=document.getElementById('prog-fill');
+  if(fill){fill.style.width=pct+'%';fill.style.background=issues>0?'var(--red)':pct===100?'var(--green)':'var(--orange)';}
+  const pd=document.getElementById('p-done');
+  const pt=document.getElementById('p-total');
+  const pi=document.getElementById('p-issue');
+  if(pd)pd.textContent=done;
+  if(pt)pt.textContent=total;
+  if(pi)pi.textContent=issues;
+
+  // Award XP when 100% complete
+  if(pct===100){
+    const doneKey=`${S.dept}-${S.shift}-${dayStr}`;
+    if(!S.doneToday[doneKey]){
+      S.doneToday[doneKey]=true;
+      const base=XP_TABLE[S.dept+'-'+S.shift]||XP_TABLE[S.dept]||50;
+      const bonus=issues===0?BONUS_PERFECT:0;
+      const campBonus=S.camp?base:0;
+      const total=base+bonus+campBonus;
+      S.xp+=total;
+      // Update streak
+      if(S.lastDay!==dayStr){S.streak+=1;S.lastDay=dayStr;}
+      saveXP();
+      awardXP(total, '');
+    }
+  }
+}
+
+function toggleSec(id){
+  document.getElementById('sc-'+id)?.classList.toggle('collapsed');
+}
+
+function previewImg(evt,secId){
+  const file=evt.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const p=document.getElementById('imgprev-'+secId);
+    if(p){p.style.display='flex';const img=document.createElement('img');img.src=e.target.result;img.style.cssText='width:76px;height:76px;object-fit:cover;border-radius:8px;border:1px solid var(--border)';p.appendChild(img);}
+  };
+  r.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════
+// XP PAGE
+// ═══════════════════════════════════════════════
+function renderXPPage(){
+  const bonusXP = getBonusTotalXP();
+  const totalXP = S.xp;
+  const rank=getRank(S.xp);
+  const nextRank=RANKS[RANKS.indexOf(rank)+1];
+
+  // Hero
+  const hero=document.getElementById('rank-hero');
+  if(hero){
+    const pct=nextRank?Math.round(((S.xp-rank.minXP)/(nextRank.minXP-rank.minXP))*100):100;
+    const tlPct = Math.min(100, Math.round((S.xp / CAREER_TL) * 100));
+    const smPct = Math.min(100, Math.round((S.xp / CAREER_SM) * 100));
+    hero.innerHTML=`
+      <div class="rank-badge-big" style="background:${rank.color}25;border-color:${rank.color}">${rank.icon}</div>
+      <div class="rank-info" style="flex:1">
+        <h2>${rank.name}  <span style="font-size:13px;font-weight:600;color:#93C5FD">${rank.note||''}</span></h2>
+        <p>${nextRank?`Cần thêm ${(nextRank.minXP-S.xp).toLocaleString('vi-VN')} XP để đạt ${nextRank.name}`:'Đã đạt cấp cao nhất 🏆'}</p>
+        ${nextRank?`<div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${pct}%"></div></div>
+        <div class="xp-label">${S.xp.toLocaleString('vi-VN')} / ${nextRank.minXP.toLocaleString('vi-VN')} XP</div>`:''}
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:6px 12px;font-size:11px">
+            <span style="color:#93C5FD">⭐ Trợ lý</span>
+            <div style="height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:4px 0;width:120px">
+              <div style="height:100%;background:#FCD34D;border-radius:2px;width:${tlPct}%"></div>
+            </div>
+            <span style="color:#FCD34D;font-weight:700">${S.xp.toLocaleString('vi-VN')} / ${CAREER_TL.toLocaleString('vi-VN')} XP (${tlPct}%)</span>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:6px 12px;font-size:11px">
+            <span style="color:#93C5FD">🚀 Trưởng CH</span>
+            <div style="height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:4px 0;width:120px">
+              <div style="height:100%;background:#6EE7B7;border-radius:2px;width:${smPct}%"></div>
+            </div>
+            <span style="color:#6EE7B7;font-weight:700">${S.xp.toLocaleString('vi-VN')} / ${CAREER_SM.toLocaleString('vi-VN')} XP (${smPct}%)</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:0 8px">
+        <div class="xp-big">${S.xp.toLocaleString('vi-VN')}</div>
+        <div style="font-size:11px;opacity:.7">Tổng XP</div>
+        ${bonusXP>0?`<div style="font-size:12px;color:#93C5FD;margin-top:4px">⭐ +${bonusXP.toLocaleString('vi-VN')} thành tích</div>`:''}
+      </div>
+    `;
+  }
+
+  // Streak
+  const sv=document.getElementById('streak-val');
+  const sb=document.getElementById('streak-bonus');
+  if(sv)sv.textContent=S.streak;
+  if(sb){
+    const b=S.streak>=30?200:S.streak>=7?50:S.streak>=3?20:0;
+    sb.textContent=`Streak Bonus: +${b} XP/ngày`;
+  }
+
+  // Daily XP list
+  const dl=document.getElementById('daily-xp-list');
+  if(dl){
+    const rows=[
+      {dept:'💳 Thu Ngân Ca Sáng', key:'thu-ngan-sang', xp:50},
+      {dept:'💳 Thu Ngân Ca Tối',  key:'thu-ngan-toi',  xp:50},
+      {dept:'🔧 Kỹ Thuật Ca Sáng',key:'ky-thuat-sang', xp:55},
+      {dept:'🔧 Kỹ Thuật Ca Tối', key:'ky-thuat-toi',  xp:55},
+      {dept:'📦 Kho Ca Sáng',      key:'kho-sang',      xp:65},
+      {dept:'📦 Kho Ca Tối',       key:'kho-toi',       xp:65},
+      {dept:'🛒 Bán Hàng',         key:'ban-hang',      xp:75},
+      {dept:'🤝 PG / Tài Chính',   key:'pg-tc',         xp:40},
+      {dept:'👔 Quản Lý',          key:'quan-ly',       xp:100},
+    ];
+    dl.innerHTML=rows.map(r=>{
+      const done=S.doneToday[`${r.key}-${dayStr}`];
+      return `<div class="dxp-row">
+        <span class="dxp-dept">${r.dept}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${done?`<span style="font-size:11px;background:#D1FAE5;color:#059669;padding:2px 8px;border-radius:20px;font-weight:700">✅ Đã hoàn thành</span>`:''}
+          <span class="dxp-pts">+${r.xp} XP</span>
+        </div>
+      </div>`;
+    }).join('');
+    // Bonus row
+    dl.innerHTML+=`<div class="dxp-row" style="background:#FEF3C7">
+      <span class="dxp-dept">⭐ Bonus hoàn thành không lỗi</span>
+      <span class="dxp-pts">+${BONUS_PERFECT} XP</span>
+    </div>
+    <div class="dxp-row" style="background:#EDE9FE">
+      <span class="dxp-dept">🔔 Camp mode bonus (x2)</span>
+      <span class="dxp-pts">+XP khi bật Camp</span>
+    </div>`;
+  }
+
+  // Tier list
+  const tl=document.getElementById('tier-list');
+  if(tl){
+    tl.innerHTML=RANKS.map(r=>{
+      const isCur=rank.id===r.id;
+      const isDone=S.xp>=r.maxXP;
+      const cls=isCur?'tier-row current':isDone?'tier-row done':'tier-row';
+      const sts=isCur?'<span class="tier-status ts-cur">Đang ở đây</span>':isDone?'<span class="tier-status ts-done">✅ Đạt</span>':'<span class="tier-status ts-lock">🔒 Chưa đạt</span>';
+      const careerTag = r.minXP<=CAREER_TL && CAREER_TL<r.maxXP ? '<span style="font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 6px;border-radius:4px;margin-left:4px">⭐ Trợ lý</span>'
+                      : r.minXP<=CAREER_SM && CAREER_SM<r.maxXP ? '<span style="font-size:10px;background:#D1FAE5;color:#065F46;padding:2px 6px;border-radius:4px;margin-left:4px">🚀 Trưởng CH</span>'
+                      : r.minXP===0 ? '<span style="font-size:10px;background:#EFF6FF;color:#1D4ED8;padding:2px 6px;border-radius:4px;margin-left:4px">'+(r.note||'')+'</span>'
+                      : '<span style="font-size:10px;background:#EFF6FF;color:#4B6A9B;padding:2px 6px;border-radius:4px;margin-left:4px">'+(r.note||'')+'</span>';
+      return `<div class="${cls}">
+        <div class="tier-ico">${r.icon}</div>
+        <div class="tier-info">
+          <div class="tier-name">${r.name}${careerTag}</div>
+          <div class="tier-xp">${r.minXP.toLocaleString('vi-VN')} – ${r.maxXP===99999?'∞':r.maxXP.toLocaleString('vi-VN')} XP</div>
+          <div class="tier-reward">🎁 ${r.reward}</div>
+        </div>
+        ${sts}
+      </div>`;
+    }).join('');
+  }
+
+  // Reward grid
+  const rg=document.getElementById('reward-grid');
+  if(rg){
+    rg.innerHTML=REWARDS.map(r=>{
+      const canAfford=S.xp>=r.cost;
+      return `<div class="reward-card ${canAfford?'':'locked'}" onclick="${canAfford?`redeemReward('${r.name}',${r.cost})`:''}">
+        <div class="reward-ico">${r.icon}</div>
+        <div class="reward-name">${r.name}</div>
+        <div class="reward-cost">⚡ ${r.cost.toLocaleString('vi-VN')} XP</div>
+        <div class="reward-desc">${r.desc}</div>
+        ${r.career?'<span class="career-badge">🚀 Thăng tiến</span>':''}
+        ${canAfford?'<div style="margin-top:8px;font-size:11px;color:var(--green);font-weight:700">✅ Đủ XP — Tap để đổi</div>':'<div style="margin-top:8px;font-size:11px;color:var(--muted)">Còn thiếu '+(r.cost-S.xp).toLocaleString('vi-VN')+' XP</div>'}
+      </div>`;
+    }).join('');
+  }
+}
+
+function redeemReward(name, cost){
+  if(S.xp<cost){alert('Không đủ XP!');return;}
+  if(confirm(`Đổi "${name}" với ${cost.toLocaleString('vi-VN')} XP?\n\nVui lòng liên hệ quản lý để nhận phần thưởng.`)){
+    S.xp-=cost;saveXP();renderXPPage();
+    alert(`✅ Đã ghi nhận đổi thưởng!\n📋 Mang màn hình này cho quản lý xác nhận.`);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BACKEND CONFIG
+// ═══════════════════════════════════════════════
+const API_BASE = window.OPSFLOW_API_BASE || ((window.location.protocol || '').startsWith('http') ? window.location.origin : 'http://localhost:8000');
+function apiUrl(path){ return `${API_BASE}${path}`; }
+
+function getReporterName(){
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('user_name') || params.get('reporter') || localStorage.getItem('cps_user_name') || 'Gia Triệu - Anygen';
+  localStorage.setItem('cps_user_name', name);
+  return name;
+}
+
+function makeChecklistPayload(){
+  const schema=getSchema(S.dept,S.shift);
+  const items=[];
+  schema.forEach(sec=>{
+    sec.items.forEach(it=>{
+      if(it.type==='calc') return;
+      const key=`${S.dept}-${S.shift}-${it.id}`;
+      const raw=S.data[key];
+      const item={
+        section_id: sec.id || '',
+        section_name: sec.title || 'Khác',
+        item_code: it.id || '',
+        item_label: it.label || it.id || 'Unknown',
+        item_type: it.type || 'text',
+        item_value_text: raw != null ? String(raw) : null,
+        item_status: ['ĐỦ','THIẾU','CHƯA ĐẠT','LỆCH','CHƯA DUYỆT'].includes(String(raw||'')) ? String(raw) : null,
+        item_note: null,
+        image_url: null
+      };
+      const num=Number(raw);
+      if(!Number.isNaN(num) && String(raw).trim()!=='') item.item_value_number=num;
+      items.push(item);
+    });
+  });
+  return {
+    report_id:`OPS-${Date.now()}`,
+    report_date:`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`,
+    shift:S.shift,
+    department:S.dept,
+    store_id: localStorage.getItem('cps_store_id') || 'STORE-DEMO',
+    submitted_by: getReporterName(),
+    report_text: generateReport(),
+    xp_earned: S.xp || 0,
+    streak_days: S.streak || 0,
+    source_app_version: 'v2.1-integrated',
+    items
+  };
+}
+
+// ═══════════════════════════════════════════════
+// AI GUIDE
+// ═══════════════════════════════════════════════
+const QUICK_QS = {
+  all:['Quy định đơn 2h là gì?','Phiên kiểm PK định kỳ khi nào?','Cách xử lý khi thiếu chứng từ?','Điểm XP tính như thế nào?','BGĐT là gì, quy định để ở đâu?'],
+  'thu-ngan':['Đơn DH <30\' là tính từ lúc nào?','SSHH <15\' nghĩa là gì?','Khi nào đơn giao thường bị tính trễ?','Quy trình kiểm quỹ cuối ca?','Chi TREO là gì?'],
+  'ky-thuat':['SO quá hạn xử lý thế nào?','Máy mượn được cho mượn tối đa bao lâu?','Tại sao cần upload hình máy cũ?','Miss trong nhập cũ là trường hợp nào?'],
+  'kho':['BGĐT để đâu là đúng quy định?','Kiểm CCDC vào ngày nào?','Đảo phụ kiện là làm gì?','YCC tồn đọng xử lý ra sao?','RT là gì?'],
+  'ban-hang':['SPTT là gì?','BHMR tính thế nào?','Nhóm ĐB là nhóm nào?','Miss là khách nào?'],
+  'quan-ly':['NPS tính thế nào?','CR DH Online là gì?','AIOV2 là gì?','Code BI là gì?','Tư vấn Student điều kiện?'],
+};
+
+const SOP_KNOWLEDGE = `Bạn là trợ lý AI nội bộ của CellphoneS (CPS), được huấn luyện từ SOP và quy trình vận hành thực tế.
+
+# QUY TRÌNH THU NGÂN CA SÁNG
+- Đơn Online qua DH (Đơn hàng): Thời gian xử lý phải dưới 30 phút từ khi đơn vào hệ thống đến khi được xác nhận/xử lý. Báo cáo: SL trễ / SL đơn / tỷ lệ trễ / lý do cụ thể.
+- SSHH (Sang sở hữu hàng): Chuyển trạng thái đơn qua SSHH phải dưới 15 phút. Báo tương tự.
+- Đơn 2h: Đơn giao trong 2 giờ phải xử lý dưới 20 phút từ khi nhận đến khi giao shipper.
+- Đơn giao thông thường: Không tính đơn tỉnh. Đơn nhận trước 14h phải giao trước 21h cùng ngày. Đơn nhận sau 14h phải giao trước 12h ngày hôm sau.
+- KHTN (Khách hàng tồn nợ): Kiểm tra và xử lý khách hàng còn nợ chưa thanh toán.
+
+# QUY TRÌNH THU NGÂN CA TỐI
+- Đề nghị chi TREO: Các khoản chi tạm thời chưa có chứng từ đầy đủ, cần ghi rõ lý do và số tiền.
+- Số phiếu nhập: Tổng số phiếu nhập hàng trong ngày.
+- Chứng từ cần ký: Kiểm tra toàn bộ chứng từ đã có đủ chữ ký chưa (hóa đơn, phiếu nhập, phiếu chi).
+- Thu CNNB (Chuyển nhượng nội bộ): Tiền thu từ các giao dịch chuyển nhượng trong hệ thống nội bộ.
+- Thu AIO: Thu tiền từ hệ thống AIO (All In One - tích hợp thanh toán).
+- Phát hành hóa đơn: Xuất hóa đơn VAT cho khách hàng yêu cầu.
+- Phiên kiểm quỹ ngày: Đếm và đối chiếu tiền mặt thực tế với sổ sách, phải khớp cuối ngày.
+
+# QUY TRÌNH KỸ THUẬT (CA SÁNG & TỐI)
+- SO (Service Order - Phiếu bảo hành): Phân loại thành Quá hạn (đã qua ngày hẹn chưa xong), Chờ về (đã sửa xong chờ nhà cung cấp trả), Chưa nhận (khách chưa đến lấy máy).
+- Máy mượn: Máy cho khách mượn trong thời gian sửa chữa. Phải theo dõi số lượng và hạn trả.
+- Tiếp nhận nhanh: Quy trình nhận máy nhanh tại quầy kỹ thuật. SL Trả = số máy trả khách, SL Nhận = số máy nhận sửa.
+- Upload hình máy cũ: Bắt buộc chụp và upload ảnh tình trạng máy cũ khi nhận mua/nhận sửa để tránh tranh chấp. Phải upload trong ca, nếu chưa phải ghi rõ lý do.
+- Báo cáo nhập cũ: Số lượt khách đến tham vấn, tổng số máy nhập, số nhập trả (khách mang máy đến nhưng không bán), số MISS (khách muốn bán nhưng hệ thống không định giá được hoặc từ chối).
+
+# QUY TRÌNH KHO CA SÁNG
+- Tủ trưng bày: Kiểm tra theo rule layout - đúng vị trí, đủ sản phẩm, giá tag chính xác, sạch sẽ. Phải chụp ảnh kèm timestamp.
+- Vách phụ kiện: Sắp xếp phụ kiện theo đúng planogram. Chụp ảnh theo rule.
+- Đảo phụ kiện: Định kỳ đảo vị trí hàng phụ kiện theo lịch (thường mỗi tuần hoặc theo chỉ đạo).
+- Bàn tư vấn: Bàn phải gọn gàng, có đủ tài liệu tư vấn, thiết bị demo hoạt động tốt.
+- Phòng kho nội bộ: Hàng sắp xếp đúng vị trí, có label, không để lộn xộn.
+- BGĐT (Bảng giá điện tử): Phải phân loại để riêng 1 khu vực, TUYỆT ĐỐI không gắn vào móc treo hàng hóa. Báo % mã hàng cha đã có BGĐT / tổng định biên, và % số lượng BGĐT đã đưa vào sử dụng.
+
+# QUY TRÌNH KHO CA TỐI
+- YCC (Yêu cầu chuyển): Các phiếu yêu cầu chuyển hàng giữa kho/cửa hàng chưa được xử lý. Phải báo lý do tồn đọng.
+- PO (Purchase Order): Đơn đặt hàng từ công ty về nhà cung cấp chưa được xử lý/nhận.
+- Phiên kiểm cuối ngày: Kiểm kê CTM (Chính thống máy) bao gồm máy cũ và máy demo. Phải được duyệt trên hệ thống.
+- RT (Return): Hàng trả về từ khách hoặc trả nhà cung cấp trong ngày.
+- Phiên kiểm PK định kỳ: Kiểm kê phụ kiện, thực hiện vào THỨ 5 hàng tuần (hoặc theo lịch đặc biệt).
+- Phiên kiểm CCDC (Công cụ dụng cụ): Kiểm kê tài sản cố định, dụng cụ, thực hiện vào NGÀY 20 hàng tháng.
+
+# QUY TRÌNH BÁN HÀNG
+- DS (Doanh số): Target được giao từ đầu tháng, so sánh thực đạt và tính còn thiếu.
+- SPTT (Sản phẩm thay thế): Máy cũ thu mua. Target, thực đạt, còn thiếu.
+- BHMR (Bảo hành mở rộng) / S-Star: Gói bảo hành ngoài, tính theo số hợp đồng bán được.
+- Nhóm ĐB (Đặc biệt): Các sản phẩm/chương trình đặc biệt theo thời điểm.
+- Miss: Khách đã vào cửa hàng nhưng nhân viên không tiếp cận/tư vấn được.
+- Tải App: Khách tải app CPS trong ca.
+- TV Sinh viên (Tư vấn sinh viên): Tư vấn khách hàng là sinh viên về chương trình trả góp/ưu đãi sinh viên.
+
+# QUY TRÌNH QUẢN LÝ CẢ NGÀY
+- NPS (Net Promoter Score): Điểm đánh giá từ khách hàng. Nếu dưới chuẩn phải ghi lỗi cụ thể và phương án xử lý.
+- CR DH Online ra SP: Tỷ lệ đơn hàng online thực sự ra sản phẩm (giao thành công).
+- AIOV2: Hệ thống AI hỗ trợ tư vấn và bán hàng phiên bản 2. Theo dõi tỷ lệ nhân viên sử dụng.
+- BGĐT: Bảng giá điện tử - theo dõi % mã hàng cha đã được gắn BGĐT theo định biên.
+- Code BI: Mã giảm giá nội bộ - theo dõi số tiền vượt ngân sách.
+- SIM VNSKY: SIM của đối tác VNSKY, theo dõi tỷ lệ bán kèm và kích hoạt.
+- NLVH (Năng lực vận hành): Bộ chỉ số đánh giá hiệu quả vận hành tổng thể.
+
+# HỆ THỐNG XP VÀ THĂNG TIẾN
+- XP kiếm được khi hoàn thành checklist: Thu Ngân 50 XP/ca, Kỹ Thuật 55 XP/ca, Kho 65 XP/ca, Bán Hàng 75 XP, PG/TC 40 XP, Quản Lý 100 XP.
+- Bonus +20 XP khi hoàn thành 100% không có lỗi.
+- Streak bonus: 3 ngày +20 XP, 7 ngày +50 XP, 30 ngày +200 XP.
+- Camp mode: XP nhân đôi khi bật chế độ Camp.
+- Rank: Nhân viên Mới (0-300) → Chuyên viên Junior (300-800) → Chuyên viên (800-1800) → Senior Staff (1800-3500) → Star Member (3500-6000) → Elite Ops (6000+).
+- Đổi thưởng: Sticker 200 XP, Móc khóa linh vật 500 XP, Áo thun 900 XP, Bình giữ nhiệt 1500 XP, Balo 2500 XP.
+- Thăng tiến: 3000 XP đổi công điểm ứng tuyển Team Leader, 5000 XP ưu tiên SM, 8000 XP đề cử AM.
+
+Hãy trả lời NGẮN GỌN, thực tế, dùng tiếng Việt. Dùng bullet points khi có nhiều điểm. Nếu câu hỏi không liên quan đến CPS, hãy hướng về chủ đề vận hành.`;
+
+function setAIDept(dept, el){
+  S.aiDept=dept;
+  document.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderQuickQs();
+}
+
+function renderQuickQs(){
+  const qs=QUICK_QS[S.aiDept]||QUICK_QS['all'];
+  document.getElementById('quick-qs').innerHTML=qs.map(q=>
+    `<button class="ai-q" onclick="askQuestion('${q}')">${q}</button>`
+  ).join('');
+}
+
+function askQuestion(q){
+  document.getElementById('chat-input').value=q;
+  sendMsg();
+}
+
+function addMsg(role, text){
+  const area=document.getElementById('chat-area');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const avText=role==='bot'?'🤖':'TÔI';
+  div.innerHTML=`
+    <div class="msg-av ${role}">${avText}</div>
+    <div class="msg-bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)/gm,'<li>$1</li>').replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>')}</div>
+  `;
+  area.appendChild(div);
+  area.scrollTop=area.scrollHeight;
+}
+
+function addTyping(){
+  const area=document.getElementById('chat-area');
+  const div=document.createElement('div');
+  div.className='msg bot';
+  div.id='typing-indicator';
+  div.innerHTML=`<div class="msg-av bot">🤖</div><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  area.appendChild(div);
+  area.scrollTop=area.scrollHeight;
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+
+  addMsg('user',txt);
+  S.chatHistory.push({role:'user',content:txt});
+
+  document.getElementById('send-btn').disabled=true;
+  addTyping();
+
+  try {
+    const resp=await fetch(apiUrl('/api/ask'),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        question: txt,
+        department: S.aiDept,
+        shift: S.shift,
+        store_id: localStorage.getItem('cps_store_id') || 'STORE-DEMO',
+        session_id: 'web-session',
+        user_name: getReporterName()
+      })
+    });
+    const d=await resp.json();
+    document.getElementById('typing-indicator')?.remove();
+    const reply=d.answer||'Xin lỗi, chưa lấy được câu trả lời từ backend.';
+    S.chatHistory.push({role:'assistant',content:reply});
+    addMsg('bot',reply);
+  } catch(e){
+    document.getElementById('typing-indicator')?.remove();
+    const fallback=offlineFallback(txt);
+    S.chatHistory.push({role:'assistant',content:fallback});
+    addMsg('bot',fallback);
+  }
+  document.getElementById('send-btn').disabled=false;
+}
+
+function offlineFallback(q){
+  const ql=q.toLowerCase();
+  if(ql.includes('2h')||ql.includes('hai giờ')) return 'Đơn 2h phải xử lý **dưới 20 phút** từ khi nhận đến khi giao shipper. Tính từ lúc đơn được xác nhận trong hệ thống.';
+  if(ql.includes('30')&&ql.includes('dh')) return 'Đơn DH (Đơn hàng) online phải xử lý **dưới 30 phút** từ khi đơn vào hệ thống. Báo: SL trễ / SL đơn / lý do cụ thể.';
+  if(ql.includes('sshh')||ql.includes('15')) return 'SSHH là Sang sở hữu hàng. Chuyển trạng thái đơn phải dưới **15 phút**. Nếu trễ phải ghi rõ lý do.';
+  if(ql.includes('bgđt')||ql.includes('bảng giá điện')) return 'BGĐT (Bảng giá điện tử) phải: **Để riêng 1 khu vực**, KHÔNG gắn vào móc treo. Báo: % mã hàng cha có BGĐT và % đã sử dụng.';
+  if(ql.includes('thứ 5')||ql.includes('pk định kỳ')) return 'Kiểm PK (Phụ kiện) định kỳ vào **Thứ 5 hàng tuần** (hoặc theo thời điểm đặc biệt). Trong tool sẽ tự highlight khi đến thứ 5.';
+  if(ql.includes('ngày 20')||ql.includes('ccdc')) return 'Phiên kiểm CCDC (Công cụ dụng cụ) vào **Ngày 20 hàng tháng**. Tool tự nhận diện và highlight.';
+  if(ql.includes('xp')||ql.includes('điểm')) return 'XP kiếm khi hoàn thành checklist:\n- Thu Ngân: 50 XP/ca\n- Kỹ Thuật: 55 XP/ca\n- Kho: 65 XP/ca\n- Bán Hàng: 75 XP\n- Quản Lý: 100 XP\n- Bonus không lỗi: +20 XP\n- Camp mode: x2 XP';
+  if(ql.includes('miss')) return 'MISS trong bán hàng là khách đã vào cửa hàng nhưng nhân viên **không tiếp cận được**. Phải ghi số lượng và nguyên nhân. Trong kỹ thuật, MISS là trường hợp khách muốn bán máy cũ nhưng hệ thống không định giá được hoặc từ chối.';
+  if(ql.includes('nps')) return 'NPS (Net Promoter Score) là điểm đánh giá của khách hàng sau mua. Nếu có NPS thấp phải ghi **lỗi cụ thể** và **phương án xử lý (PA)** vào báo cáo.';
+  return '(Đang offline) Vui lòng kết nối mạng để nhận câu trả lời chi tiết từ AI. Hoặc xem SOP tài liệu nội bộ.';
+}
+
+// ═══════════════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════════════
+function generateReport(){
+  const dept=DEPTS.find(d=>d.id===S.dept);
+  const schema=getSchema(S.dept,S.shift);
+  const shiftL={'sang':'☀️ CA SÁNG','toi':'🌙 CA TỐI','all':''}[S.shift]||'';
+  let lines=[
+    `📋 BÁO CÁO ${dept?.label.replace(/[💳🔧📦🛒🤝👔]\s*/g,'').toUpperCase()} ${shiftL}`,
+    `📅 ${dayNames[now.getDay()]} ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} — ${now.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}`,
+    '─'.repeat(32)
+  ];
+  schema.forEach(sec=>{
+    lines.push(`\n${sec.icon} ${sec.title.toUpperCase()}`);
+    sec.items.forEach(it=>{
+      if(it.type==='calc')return;
+      const k=`${S.dept}-${S.shift}-${it.id}`;
+      lines.push(`  • ${it.label}: ${S.data[k]||'—'}`);
+    });
+  });
+  lines.push('\n'+'─'.repeat(32));
+  lines.push(`✍️ Người báo cáo: ${getReporterName()}`);
+  return lines.join('\n');
+}
+
+// ═══════════════════════════════════════════════
+// BACKEND REPORT + LARK SYNC
+// ═══════════════════════════════════════════════
+async function fetchGeneratedReportFromBackend() {
+  try {
+    const payload = makeChecklistPayload();
+    const res = await fetch(apiUrl('/api/generate-report'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        department: payload.department,
+        shift: payload.shift,
+        report_date: payload.report_date,
+        store_id: payload.store_id,
+        items: payload.items
+      })
+    });
+    if (!res.ok) throw new Error('generate-report failed');
+    return await res.json();
+  } catch (err) {
+    return null;
+  }
+}
+
+async function syncChecklistToBackend() {
+  const btn = document.getElementById('btn-sync');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Đang sync...'; }
+  try {
+    const payload = makeChecklistPayload();
+    const generated = await fetchGeneratedReportFromBackend();
+    if (generated?.report_text) payload.report_text = generated.report_text;
+    const res = await fetch(apiUrl('/api/sync-checklist'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(btn){ btn.textContent='✅ Đã sync'; }
+    setTimeout(()=>{ if(btn){ btn.disabled=false; btn.textContent='🔄 Đồng bộ'; } }, 2500);
+    alert(`Đồng bộ xong: ${data.items_written || 0} item, ${data.incidents_created || 0} incident.`);
+  } catch (err) {
+    if(btn){ btn.disabled=false; btn.textContent='❌ Sync lỗi'; }
+    alert('Không đồng bộ được với backend. Kiểm tra API_BASE và backend server.');
+  }
+}
+
+async function sendToLark() {
+  const btn = document.getElementById('btn-lark');
+  const generated = await fetchGeneratedReportFromBackend();
+  const report = generated?.report_text || generateReport();
+  const dept = DEPTS.find(d => d.id === S.dept);
+  const shiftLabel = S.shift === 'sang' ? '☀️ Ca Sáng' : S.shift === 'toi' ? '🌙 Ca Tối' : '';
+  const headerTitle = `📋 ${dept?.label?.replace(/[💳🔧📦🛒🤝👔]\s*/g,'') || ''} ${shiftLabel}`.trim();
+  btn.textContent = '⏳ Đang gửi...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(apiUrl('/api/send-lark-report'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ title: headerTitle, report_text: report })
+    });
+    await res.json();
+    btn.textContent = '✅ Đã gửi';
+    setTimeout(() => { btn.textContent = '📤 Gửi Lark'; btn.disabled = false; }, 2500);
+  } catch (err) {
+    navigator.clipboard.writeText(report).catch(()=>{});
+    btn.textContent = '📋 Đã copy';
+    btn.disabled = false;
+    alert('Không gửi qua backend được. Mình đã copy báo cáo vào clipboard để bạn paste thủ công.');
+  }
+}
+
+function openReport(){
+  document.getElementById('report-pre').textContent=generateReport();
+  document.getElementById('modal-report').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-report').classList.remove('open');}
+function copyReport(){
+  navigator.clipboard.writeText(generateReport()).then(()=>{
+    const b=document.getElementById('btn-lark');
+    if(b){const o=b.textContent;b.textContent='✅ Đã copy!';setTimeout(()=>b.textContent=o,2000);}
+  }).catch(()=>{openReport();});
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderDeptBar();
+document.getElementById('shift-bar').style.display='flex';
+renderChecklist();
+renderXPPage();
+renderBonusPage();
+
+// Welcome bot message
+const initMsgs=[
+  {role:'bot',text:'Xin chào! 👋 Tôi là **OpsFlow AI**, trợ lý quy trình nội bộ CellphoneS.\n\nTôi có thể giúp bạn:\n- Giải thích các quy định theo từng bộ phận\n- Tra cứu SOP, tiêu chuẩn thời gian\n- Hướng dẫn xử lý tình huống bất thường\n- Giải thích hệ thống XP & thăng tiến\n\nBạn muốn hỏi gì?'}
+];
+initMsgs.forEach(m=>addMsg(m.role,m.text));
+initPageFromLink();
+</script>
+</body>
+</html>
